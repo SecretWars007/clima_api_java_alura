@@ -13,10 +13,13 @@ public class ObtenerClimaUseCase {
         this.climaRepository = climaRepository;
     }
 
-    public Clima execute(String ciudad) throws Exception {
+    public Clima execute(String ciudad, String pais) throws Exception {
+        if  (pais == null || pais.isEmpty() || pais.isBlank()) {
+            throw new IllegalArgumentException("El país no puede ser nulo o vacío");
+        }
         if  (ciudad == null || ciudad.isEmpty() || ciudad.isBlank()) {
             throw new IllegalArgumentException("La ciudad no puede ser nula o vacía");
         }
-        return climaRepository.obtenerPorCiudad(ciudad);
+        return climaRepository.obtenerClimaMundial(ciudad, pais);
     }
 }

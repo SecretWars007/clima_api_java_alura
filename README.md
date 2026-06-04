@@ -31,7 +31,7 @@ Servicio REST minimalista para consultar el clima actual de una ciudad usando la
 
 ## Descripción
 
-`Clima API` es una aplicación REST basada en Spring Boot que ofrece una consulta rápida del clima actual de una ciudad. La aplicación:
+`Clima API` es una aplicación REST basada en Spring Boot que ofrece una consulta rápida del clima actual de una ciudad a nivel mundial. La aplicación:
 
 - recibe la ciudad como parámetro en la URL,
 - llama a OpenWeather para obtener datos reales,
@@ -42,11 +42,12 @@ Está pensada como proyecto educativo o una capa de servicio que puede integrars
 
 ## Características
 
-- Endpoint REST para consultar el clima de cualquier ciudad.
+- Endpoint REST para consultar el clima de cualquier ciudad del mundo.
 - Integración con OpenWeather usando `HttpClient` de Java.
 - Conversión de respuesta externa a un modelo de dominio `Clima`.
 - Separación de responsabilidades mediante capas de controlador, caso de uso y adaptador.
 - Configuración externa mediante variables de entorno o archivo `.env`.
+- Documentación OpenAPI/Swagger UI disponible en el servicio.
 - Respuesta JSON lista para consumir por frontends o APIs.
 
 ## Arquitectura
@@ -106,10 +107,13 @@ flowchart TD
 ## Stack tecnológico
 
 - Java 17+ (recomendado)
-- Spring Boot
+- Spring Boot 4.x
 - Maven
 - Gson
 - Java HttpClient (`java.net.http`)
+- springdoc-openapi para documentación automática
+- spring-dotenv para cargar variables de entorno desde `.env`
+- Spring Boot DevTools para desarrollo en caliente
 
 ## Requisitos previos
 
@@ -164,6 +168,12 @@ O con Maven instalado:
 mvn spring-boot:run
 ```
 
+La documentación Swagger UI estará disponible en:
+
+```bash
+http://localhost:8080/swagger-ui.html
+```
+
 ### Construir el JAR
 
 ```bash
@@ -182,6 +192,8 @@ El ejecutable compilado quedará en `target/clima_api-0.0.1-SNAPSHOT.jar`.
 
 Base URL: `http://localhost:{SERVER_PORT}/api/V1/clima`
 
+La documentación OpenAPI generada por `springdoc` está disponible en `/swagger-ui.html`.
+
 ### Endpoint principal
 
 - `GET /api/V1/clima/{ciudad}`
@@ -193,7 +205,7 @@ Parámetros:
 Comportamiento:
 
 - Valida que la ciudad no sea nula, vacía o en blanco.
-- Consulta OpenWeather con `ciudad,BO` para obtener clima de Bolivia.
+- Consulta OpenWeather con el nombre de ciudad proporcionado para obtener clima global.
 - Retorna un objeto `Clima` en JSON.
 
 ### Ejemplos de uso
@@ -202,6 +214,12 @@ Consultar el clima de Santa Cruz:
 
 ```bash
 curl -s "http://localhost:8080/api/V1/clima/Santa%20Cruz"
+```
+
+Consultar el clima de La Paz usando el código de país `BO` (Bolivia):
+
+```bash
+curl -s "http://localhost:8080/api/V1/clima/La%20Paz,BO"
 ```
 
 Si ejecutas el servicio en el puerto 8080, la URL completa será:
@@ -259,7 +277,7 @@ http://localhost:8080/api/V1/clima/Santa%20Cruz
 
 - `ClimaRespositoryImpl`:
   - Implementa la llamada HTTP a OpenWeather.
-  - Construye la URL con parámetros: `q={ciudad},BO`, `appid`, `units=metric`, `lang=es`.
+  - Construye la URL con parámetros: `q={ciudad}`, `appid`, `units=metric`, `lang=es`.
   - Parsea la respuesta JSON en `OpenWeatherResponse`.
   - Retorna un objeto `Clima` con datos normalizados.
 
@@ -270,6 +288,8 @@ http://localhost:8080/api/V1/clima/Santa%20Cruz
 ## Pruebas
 
 El proyecto cuenta con pruebas unitarias básicas en `src/test/java`.
+
+La dependencia `spring-boot-starter-webmvc-test` se utiliza para ejecutar pruebas de la capa web.
 
 Ejecuta todos los tests con:
 
@@ -310,7 +330,7 @@ java -jar target\clima_api-0.0.1-SNAPSHOT.jar
 
 - Manejar errores HTTP de forma explícita y devolver códigos 4xx/5xx apropiados.
 - Añadir validación de parámetros más completa.
-- Cambiar la lógica de consulta para soportar otras regiones y no forzar `,BO`.
+- Soportar nombres de ciudad con país opcional para mejorar precisión global.
 - Agregar caché en memoria o Redis para reducir llamadas a OpenWeather.
 - Añadir pruebas de integración que simulen la API externa (por ejemplo WireMock).
 - Registrar métricas y logs estructurados.

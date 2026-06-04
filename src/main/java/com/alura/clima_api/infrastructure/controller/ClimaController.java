@@ -27,10 +27,10 @@ public class ClimaController {
         this.obtenerClimaUseCase = obtenerClimaUseCase;
     }
 
-    @GetMapping("/{ciudad}")
+    @GetMapping("/{pais}/{ciudad}")
     @Operation(summary = "Obtener el clima de una ciudad", description = "Devuelve el clima actual de la ciudad especificada")
-    public String getClima(@PathVariable String ciudad) throws Exception {
-        return gson.toJson(obtenerClimaUseCase.execute(ciudad));
+    public String getClima(@PathVariable String ciudad, @PathVariable String pais) throws Exception {
+        return gson.toJson(obtenerClimaUseCase.execute(ciudad, pais));
     }
     
 }

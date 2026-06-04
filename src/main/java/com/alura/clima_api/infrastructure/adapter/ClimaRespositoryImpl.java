@@ -27,11 +27,11 @@ public class ClimaRespositoryImpl implements ClimaRepository {
     private HttpClient httpClient = HttpClient.newHttpClient();
 
     @Override
-    public Clima obtenerPorCiudad(String ciudad) throws Exception {
+    public Clima obtenerClimaMundial(String ciudad, String pais) throws Exception {
 
-        String ciudadCodificada = URLEncoder.encode(ciudad + ",BO", StandardCharsets.UTF_8);
+        String climaCodificada = URLEncoder.encode(ciudad.trim() + "," + pais.trim(), StandardCharsets.UTF_8);
 
-        String url = String.format("%s?q=%s&appid=%s&units=metric&lang=es", apiUrl, ciudadCodificada, apiKey);
+        String url = String.format("%s?q=%s&appid=%s&units=metric&lang=es", apiUrl, climaCodificada, apiKey);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
@@ -47,6 +47,7 @@ public class ClimaRespositoryImpl implements ClimaRepository {
 
         return new Clima(
                 weatherResponse.name,
+                pais,
                 weatherResponse.main.getTemp(),
                 weatherResponse.main.getHumidity(),
                 weatherResponse.weather[0].getDescription()
